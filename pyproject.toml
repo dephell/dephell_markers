@@ -1,0 +1,16 @@
+[tool.dephell.main]
+from = {format = "poetry", path = "pyproject.toml"}
+to = {format = "setuppy", path = "setup.py"}
+
+[tool.poetry]
+name = "dephell_markers"
+version = "0.1.0"
+authors = ["orsinium"]
+description = "Work with environment markers (PEP-496)"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.5"
+attrs = "*"
+dephell_specifier = "*"
+packaging = "*"
