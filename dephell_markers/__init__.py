@@ -1,11 +1,10 @@
 # app
-from .and_marker import AndMarker
-from .markers import Markers
-from .or_marker import OrMarker
-from .string import StringMarker
-from .version import VersionMarker
+from ._marker import StringMarker, VersionMarker
+from ._markers import Markers
+from ._operation import AndMarker, OrMarker
 
 
+# keep sorted
 __all__ = [
     'AndMarker',
     'Markers',

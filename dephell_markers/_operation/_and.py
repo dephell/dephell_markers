@@ -2,7 +2,7 @@
 from typing import Optional, Set, Tuple
 
 # app
-from .operation import Operation
+from ._base import Operation
 
 
 class AndMarker(Operation):

@@ -3,8 +3,8 @@ import attr
 from packaging.markers import Value, Variable
 
 # app
-from .utils import cached_property
-from .constants import ALIASES
+from .._cached_property import cached_property
+from .._constants import ALIASES
 
 
 @attr.s(cmp=False)

@@ -7,12 +7,9 @@ from packaging import markers as packaging
 from packaging.markers import Variable
 
 # app
-from .base import BaseMarker
-from .and_marker import AndMarker
-from .constants import STRING_VARIABLES, VERSION_VARIABLES
-from .or_marker import OrMarker
-from .string import StringMarker
-from .version import VersionMarker
+from ._marker import BaseMarker, StringMarker, VersionMarker
+from ._operation import OrMarker, AndMarker
+from ._constants import STRING_VARIABLES, VERSION_VARIABLES
 
 
 class Markers:

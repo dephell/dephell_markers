@@ -3,7 +3,7 @@ import pytest
 from packaging.markers import Op, Value, Variable
 
 # project
-from dephell_markers.string import StringMarker
+from dephell_markers import StringMarker
 
 
 @pytest.mark.parametrize('op, val, expected', [

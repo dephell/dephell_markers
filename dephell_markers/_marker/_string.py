@@ -5,7 +5,7 @@ from typing import Optional
 from packaging.markers import Op, Value
 
 # app
-from .base import BaseMarker
+from ._base import BaseMarker
 
 
 class StringMarker(BaseMarker):
