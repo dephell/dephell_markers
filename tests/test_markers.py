@@ -96,6 +96,6 @@ def test_str(given, expected):
         'os_name == "nt" and sys_platform != "linux" or os_name == "nt" and sys_platform == "linux"',
     ),
 ])
-def test_merge(given, expected):
+def test_merge_the_same(given, expected):
     m = Markers(given)
     assert str(m) == expected
