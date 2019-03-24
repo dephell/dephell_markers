@@ -20,6 +20,19 @@ class Markers:
         else:
             self._marker = markers
 
+    # properties
+
+    @property
+    def python_version(self) -> Optional[RangeSpecifier]:
+        value = self.get_version('python_version')
+        if value is not None:
+            return RangeSpecifier(value)
+        return None
+
+    @property
+    def extra(self) -> Optional[str]:
+        return self.get_string('extra')
+
     # public methods
 
     def get_string(self, name: str) -> Optional[str]:
@@ -132,19 +145,6 @@ class Markers:
             else:
                 new_group.append(node)
         return new_group
-
-    # properties
-
-    @property
-    def python_version(self) -> Optional[RangeSpecifier]:
-        value = self.get_version('python_version')
-        if value is not None:
-            return RangeSpecifier(value)
-        return None
-
-    @property
-    def extra(self) -> Optional[str]:
-        return self.get_string('extra')
 
     # magic methods
 
