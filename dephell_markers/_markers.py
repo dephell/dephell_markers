@@ -1,6 +1,6 @@
 # built-in
 from copy import copy
-from typing import Optional, Union
+from typing import Optional, Union, Set
 
 # external
 from dephell_specifier import RangeSpecifier
@@ -22,6 +22,23 @@ class Markers:
             self._marker = markers
 
     # properties
+
+    @property
+    def variables(self) -> Set[str]:
+        if isinstance(self._marker, BaseMarker):
+            return {self._marker.variable}
+        return self._marker.variables
+
+    @property
+    def compat(self) -> bool:
+        for variable in self.variables:
+            if variable in STRING_VARIABLES:
+                if self.get_string(variable) is None:
+                    return False
+            if variable in VERSION_VARIABLES:
+                if self.get_version(variable) is None:
+                    return False
+        return True
 
     @property
     def python_version(self) -> Optional[RangeSpecifier]:

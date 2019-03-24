@@ -12,6 +12,7 @@ from dephell_markers import Markers
     ('os_name == "posix" and python_version >= "2.7"', 'posix'),
 
     ('os_name == "posix" and os_name == "nt"', None),
+    ('os_name == "nt" and os_name != "nt"', None),
     ('os_name == "posix" or python_version >= "2.7"', None),
 ])
 def test_get_string(marker, value):
@@ -123,3 +124,24 @@ def test_or(left, right, expected):
     m = Markers(left)
     m |= Markers(right)
     assert str(m) == str(Markers(expected))
+
+
+@pytest.mark.parametrize('marker, expected', [
+    ('os_name == "nt" and sys_platform != "linux"', {'os_name', 'sys_platform'}),
+    ('os_name == "nt" and os_name != "nt"', {'os_name'}),
+    ('os_name == "nt" and os_name != "unix"', {'os_name'}),
+    ('os_name == "nt" and os_name == "unix"', {'os_name'}),
+])
+def test_variables(marker, expected):
+    assert Markers(marker).variables == expected
+
+
+@pytest.mark.parametrize('marker, ok', [
+    ('os_name == "nt" and sys_platform == "linux"', True),
+    ('os_name == "nt" and os_name == "posix"', False),
+    # ('os_name == "nt" and sys_platform != "linux"', True),
+    # ('os_name == "nt" and os_name != "nt"', False),
+    # ('os_name == "nt" and os_name != "unix"', True),
+])
+def test_compat(marker, ok):
+    assert Markers(marker).compat is ok

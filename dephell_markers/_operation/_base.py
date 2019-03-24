@@ -1,5 +1,7 @@
 # built-in
-from typing import Optional
+from typing import Optional, Set
+
+from .._cached_property import cached_property
 
 
 class Operation:
@@ -16,6 +18,16 @@ class Operation:
                 # if this is single marker or other Operation then just append
                 new_nodes.append(node)
         self.nodes = new_nodes
+
+    @cached_property
+    def variables(self) -> Set[str]:
+        variables = set()  # type: Set[str]
+        for node in self.nodes:
+            if isinstance(node, Operation):
+                variables.union(node.variables)
+            else:
+                variables.add(node.variable)
+        return variables
 
     def _get_values(self, name: str):
         raise NotImplementedError
