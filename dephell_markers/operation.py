@@ -42,6 +42,16 @@ class Operation:
             return None
         return self.sep.join(sorted(op + val for op, val in values))
 
+    # magic methods
+
+    def __eq__(self, other):
+        if not isinstance(other, Operation):
+            return NotImplemented
+        return self.op == other.op and self.nodes == other.nodes
+
+    def __hash__(self):
+        return hash(self.nodes)
+
     def __str__(self):
         sep = ' ' + self.op + ' '
         return '(' + sep.join(map(str, self.nodes)) + ')'

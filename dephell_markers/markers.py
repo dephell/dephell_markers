@@ -23,6 +23,38 @@ class Markers:
         else:
             self._marker = markers
 
+    # public methods
+
+    def get_string(self, name: str) -> Optional[str]:
+        return self._marker.get_string(name=name)
+
+    def get_version(self, name: str) -> Optional[str]:
+        return self._marker.get_version(name=name)
+
+    def add(self, *, name: str, value, operator: str = '==') -> BaseMarker:
+        if operator in {'in', 'not in'}:
+            msg = 'unsupported operation: {}'
+            raise ValueError(msg.format(operator))
+
+        if name in STRING_VARIABLES:
+            marker_cls = StringMarker
+        elif name in VERSION_VARIABLES:
+            marker_cls = VersionMarker
+        marker = marker_cls(
+            lhs=packaging.Variable(name),
+            op=packaging.Op(operator),
+            rhs=packaging.Value(value),
+        )
+
+        if isinstance(self._marker, AndMarker):
+            self._marker.nodes.append(marker)
+            return marker
+
+        self._marker = AndMarker(marker, self._marker)
+        return marker
+
+    # private methods
+
     @staticmethod
     def _parse(markers: Union[list, str, 'Markers', packaging.Marker]):
         if isinstance(markers, list):
@@ -59,7 +91,7 @@ class Markers:
                     marker_cls = StringMarker
                 elif var in VERSION_VARIABLES:
                     if op.value in {'in', 'not in'}:
-                        msg = 'Unsupported operation for version marker {}: {}'
+                        msg = 'unsupported operation for version marker {}: {}'
                         raise ValueError(msg.format(var, op.value))
                     marker_cls = VersionMarker
                 else:
@@ -85,39 +117,26 @@ class Markers:
             if len(group) == 1:
                 new_groups.append(group[0])
             elif len(group) > 1:
-                new_groups.append(AndMarker(*group))
+                new_groups.append(AndMarker(*cls._deduplicate(group)))
 
         if len(new_groups) == 1:
             return new_groups[0]
         return OrMarker(*new_groups)
 
-    def get_string(self, name: str) -> Optional[str]:
-        return self._marker.get_string(name=name)
+    @staticmethod
+    def _deduplicate(group: list) -> list:
+        new_group = []
+        for node in group:
+            for merged_node in new_group:
+                if type(node) is not type(merged_node):
+                    continue
+                if merged_node == node:
+                    break
+            else:
+                new_group.append(node)
+        return new_group
 
-    def get_version(self, name: str) -> Optional[str]:
-        return self._marker.get_version(name=name)
-
-    def add(self, *, name: str, value, operator: str = '==') -> BaseMarker:
-        if operator in {'in', 'not in'}:
-            msg = 'Unsupported operation: {}'
-            raise ValueError(msg.format(operator))
-
-        if name in STRING_VARIABLES:
-            marker_cls = StringMarker
-        elif name in VERSION_VARIABLES:
-            marker_cls = VersionMarker
-        marker = marker_cls(
-            lhs=packaging.Variable(name),
-            op=packaging.Op(operator),
-            rhs=packaging.Value(value),
-        )
-
-        if isinstance(self._marker, AndMarker):
-            self._marker.nodes.append(marker)
-            return marker
-
-        self._marker = AndMarker(marker, self._marker)
-        return marker
+    # properties
 
     @property
     def python_version(self) -> Optional[RangeSpecifier]:
@@ -129,6 +148,8 @@ class Markers:
     @property
     def extra(self) -> Optional[str]:
         return self.get_string('extra')
+
+    # magic methods
 
     def __repr__(self):
         return '{}({!r})'.format(type(self).__name__, self._marker)

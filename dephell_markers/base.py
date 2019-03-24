@@ -7,7 +7,7 @@ from .utils import cached_property
 from .constants import ALIASES
 
 
-@attr.s()
+@attr.s(cmp=False)
 class BaseMarker:
     lhs = attr.ib()
     op = attr.ib()
@@ -39,3 +39,14 @@ class BaseMarker:
         if isinstance(self.rhs, Value):
             return self.rhs.value
         return self.lhs.value
+
+    def __eq__(self, other):
+        if not isinstance(other, BaseMarker):
+            return NotImplemented
+        if self.variable != other.variable:
+            return False
+        if self.operator != other.operator:
+            return False
+        if self.value != other.value:
+            return False
+        return True
