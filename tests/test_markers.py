@@ -93,6 +93,10 @@ def test_str(given, expected):
         'os_name == "nt" and sys_platform != "linux"',
     ),
     (
+        'os_name == "nt" and sys_platform != "linux" and os_name == "nt" and sys_platform != "linux"',
+        'os_name == "nt" and sys_platform != "linux"',
+    ),
+    (
         'os_name == "nt" and sys_platform != "linux" or os_name == "nt" and sys_platform == "linux"',
         'os_name == "nt" and sys_platform != "linux" or os_name == "nt" and sys_platform == "linux"',
     ),
@@ -140,8 +144,8 @@ def test_variables(marker, expected):
     ('os_name == "nt" and sys_platform == "linux"', True),
     ('os_name == "nt" and os_name == "posix"', False),
     # ('os_name == "nt" and sys_platform != "linux"', True),
-    # ('os_name == "nt" and os_name != "nt"', False),
-    # ('os_name == "nt" and os_name != "unix"', True),
+    ('os_name == "nt" and os_name != "nt"', False),
+    ('os_name == "nt" and os_name != "unix"', True),
 ])
 def test_compat(marker, ok):
     assert Markers(marker).compat is ok

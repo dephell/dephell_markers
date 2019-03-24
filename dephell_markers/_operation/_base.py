@@ -37,14 +37,19 @@ class Operation:
         if values is None:
             return None
 
-        ops, vals = list(zip(*values))
-        if len(set(vals)) != 1:
-            return None
+        # if var is equal only one value then return this value
+        equal = set()
+        non_equal = set()
+        for op, val in values:
+            if op == '==':
+                equal.add(val)
+            else:
+                non_equal.add(val)
+        if len(equal) == 1:
+            val = next(iter(equal))
+            if val not in non_equal:
+                return val
 
-        op, val = next(iter(values))
-        ops = set(ops)
-        if ops == {'=='}:
-            return val
         # TODO: support `in` operations
         return None
 
