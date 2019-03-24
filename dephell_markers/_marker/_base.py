@@ -3,8 +3,8 @@ import attr
 from packaging.markers import Value, Variable
 
 # app
-from .utils import cached_property
-from .constants import ALIASES
+from .._cached_property import cached_property
+from .._constants import ALIASES
 
 
 @attr.s(cmp=False)
@@ -39,6 +39,9 @@ class BaseMarker:
         if isinstance(self.rhs, Value):
             return self.rhs.value
         return self.lhs.value
+
+    def __hash__(self) -> int:
+        return hash((self.lhs.value, self.op.value, self.rhs.value))
 
     def __eq__(self, other):
         if not isinstance(other, BaseMarker):

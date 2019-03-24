@@ -12,6 +12,7 @@ from dephell_markers import Markers
     ('os_name == "posix" and python_version >= "2.7"', 'posix'),
 
     ('os_name == "posix" and os_name == "nt"', None),
+    ('os_name == "nt" and os_name != "nt"', None),
     ('os_name == "posix" or python_version >= "2.7"', None),
 ])
 def test_get_string(marker, value):
@@ -74,11 +75,82 @@ def test_add_python_version():
         '(python_version>="2.4" and python_version <= "2.7") or os_name == "linux"',
         'python_version >= "2.4" and python_version <= "2.7" or os_name == "linux"',
     ),
-    (
-        'os_name == "posix" and os_name == "posix"',
-        'os_name == "posix"',
-    ),
 ])
 def test_str(given, expected):
     m = Markers(given)
     assert str(m) == expected
+
+
+@pytest.mark.parametrize('given, expected', [
+    ('os_name == "posix" and os_name == "posix"', 'os_name == "posix"',),
+    ('os_name == "posix" or os_name == "posix"', 'os_name == "posix"',),
+
+    ('os_name == "posix" and os_name == "win"', 'os_name == "posix" and os_name == "win"',),
+    ('os_name == "posix" or os_name == "win"', 'os_name == "posix" or os_name == "win"',),
+
+    (
+        '(os_name == "nt" and sys_platform != "linux") or (os_name == "nt" and sys_platform != "linux")',
+        'os_name == "nt" and sys_platform != "linux"',
+    ),
+    (
+        'os_name == "nt" and sys_platform != "linux" and os_name == "nt" and sys_platform != "linux"',
+        'os_name == "nt" and sys_platform != "linux"',
+    ),
+    (
+        'os_name == "nt" and sys_platform != "linux" or os_name == "nt" and sys_platform == "linux"',
+        'os_name == "nt" and sys_platform != "linux" or os_name == "nt" and sys_platform == "linux"',
+    ),
+])
+def test_simplify_the_same(given, expected):
+    m = Markers(given)
+    assert str(m) == expected
+
+
+@pytest.mark.parametrize('left, right, expected', [
+    ('os_name == "nt"', 'sys_platform != "linux"', 'os_name == "nt" and sys_platform != "linux"'),
+    ('os_name == "nt"', 'os_name == "nt"', 'os_name == "nt"'),
+])
+def test_and(left, right, expected):
+    assert str(Markers(left) & Markers(right)) == str(Markers(expected))
+    # inplace
+    m = Markers(left)
+    m &= Markers(right)
+    assert str(m) == str(Markers(expected))
+
+
+@pytest.mark.parametrize('left, right, expected', [
+    ('os_name == "nt"', 'sys_platform != "linux"', 'os_name == "nt" or sys_platform != "linux"'),
+    ('os_name == "nt"', 'os_name == "nt"', 'os_name == "nt"'),
+])
+def test_or(left, right, expected):
+    assert str(Markers(left) | Markers(right)) == str(Markers(expected))
+    # inplace
+    m = Markers(left)
+    m |= Markers(right)
+    assert str(m) == str(Markers(expected))
+
+
+@pytest.mark.parametrize('marker, expected', [
+    ('os_name == "nt" and sys_platform != "linux"', {'os_name', 'sys_platform'}),
+    ('os_name == "nt" and os_name != "nt"', {'os_name'}),
+    ('os_name == "nt" and os_name != "unix"', {'os_name'}),
+    ('os_name == "nt" and os_name == "unix"', {'os_name'}),
+])
+def test_variables(marker, expected):
+    assert Markers(marker).variables == expected
+
+
+@pytest.mark.parametrize('marker, ok', [
+    ('os_name == "nt" and sys_platform == "linux"', True),
+    ('os_name == "nt" and os_name == "posix"', False),
+    # ('os_name == "nt" and sys_platform != "linux"', True),
+    ('os_name == "nt" and os_name != "nt"', False),
+    ('os_name == "nt" and os_name != "unix"', True),
+
+    ('python_version >= "2.7" and python_version >= "3.4"', True),
+    ('python_version >= "2.7" and python_version <= "3.4"', True),
+    ('python_version <= "2.7" and python_version >= "3.4"', False),
+    ('python_version <= "2.7" or python_version >= "3.4"', True),
+])
+def test_compat(marker, ok):
+    assert Markers(marker).compat is ok

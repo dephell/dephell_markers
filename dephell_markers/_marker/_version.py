@@ -7,9 +7,9 @@ from packaging.markers import Op, Value
 from packaging.version import parse
 
 # app
-from .utils import cached_property
-from .base import BaseMarker
-from .constants import REVERSED_OPERATIONS
+from .._cached_property import cached_property
+from ._base import BaseMarker
+from .._constants import REVERSED_OPERATIONS
 
 
 class VersionMarker(BaseMarker):

@@ -1,5 +1,7 @@
 # built-in
-from typing import Optional
+from typing import Optional, Set
+
+from .._cached_property import cached_property
 
 
 class Operation:
@@ -17,6 +19,16 @@ class Operation:
                 new_nodes.append(node)
         self.nodes = new_nodes
 
+    @cached_property
+    def variables(self) -> Set[str]:
+        variables = set()  # type: Set[str]
+        for node in self.nodes:
+            if isinstance(node, Operation):
+                variables.union(node.variables)
+            else:
+                variables.add(node.variable)
+        return variables
+
     def _get_values(self, name: str):
         raise NotImplementedError
 
@@ -25,14 +37,19 @@ class Operation:
         if values is None:
             return None
 
-        ops, vals = list(zip(*values))
-        if len(set(vals)) != 1:
-            return None
+        # if var is equal only one value then return this value
+        equal = set()
+        non_equal = set()
+        for op, val in values:
+            if op == '==':
+                equal.add(val)
+            else:
+                non_equal.add(val)
+        if len(equal) == 1:
+            val = next(iter(equal))
+            if val not in non_equal:
+                return val
 
-        op, val = next(iter(values))
-        ops = set(ops)
-        if ops == {'=='}:
-            return val
         # TODO: support `in` operations
         return None
 
@@ -47,7 +64,7 @@ class Operation:
     def __eq__(self, other):
         if not isinstance(other, Operation):
             return NotImplemented
-        return self.op == other.op and self.nodes == other.nodes
+        return self.op == other.op and set(self.nodes) == set(other.nodes)
 
     def __hash__(self):
         return hash(self.nodes)
