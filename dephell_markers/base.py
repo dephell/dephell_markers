@@ -40,6 +40,9 @@ class BaseMarker:
             return self.rhs.value
         return self.lhs.value
 
+    def __hash__(self) -> int:
+        return hash((self.lhs.value, self.op.value, self.rhs.value))
+
     def __eq__(self, other):
         if not isinstance(other, BaseMarker):
             return NotImplemented

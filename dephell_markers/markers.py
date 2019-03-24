@@ -121,7 +121,7 @@ class Markers:
 
         if len(new_groups) == 1:
             return new_groups[0]
-        return OrMarker(*new_groups)
+        return OrMarker(*cls._deduplicate(new_groups))
 
     @staticmethod
     def _deduplicate(group: list) -> list:

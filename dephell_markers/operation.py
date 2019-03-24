@@ -47,7 +47,7 @@ class Operation:
     def __eq__(self, other):
         if not isinstance(other, Operation):
             return NotImplemented
-        return self.op == other.op and self.nodes == other.nodes
+        return self.op == other.op and set(self.nodes) == set(other.nodes)
 
     def __hash__(self):
         return hash(self.nodes)

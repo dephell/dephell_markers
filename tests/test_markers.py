@@ -74,11 +74,28 @@ def test_add_python_version():
         '(python_version>="2.4" and python_version <= "2.7") or os_name == "linux"',
         'python_version >= "2.4" and python_version <= "2.7" or os_name == "linux"',
     ),
-    (
-        'os_name == "posix" and os_name == "posix"',
-        'os_name == "posix"',
-    ),
 ])
 def test_str(given, expected):
+    m = Markers(given)
+    assert str(m) == expected
+
+
+@pytest.mark.parametrize('given, expected', [
+    ('os_name == "posix" and os_name == "posix"', 'os_name == "posix"',),
+    ('os_name == "posix" or os_name == "posix"', 'os_name == "posix"',),
+
+    ('os_name == "posix" and os_name == "win"', 'os_name == "posix" and os_name == "win"',),
+    ('os_name == "posix" or os_name == "win"', 'os_name == "posix" or os_name == "win"',),
+
+    (
+        '(os_name == "nt" and sys_platform != "linux") or (os_name == "nt" and sys_platform != "linux")',
+        'os_name == "nt" and sys_platform != "linux"',
+    ),
+    (
+        'os_name == "nt" and sys_platform != "linux" or os_name == "nt" and sys_platform == "linux"',
+        'os_name == "nt" and sys_platform != "linux" or os_name == "nt" and sys_platform == "linux"',
+    ),
+])
+def test_merge(given, expected):
     m = Markers(given)
     assert str(m) == expected
