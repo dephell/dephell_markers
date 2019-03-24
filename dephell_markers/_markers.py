@@ -1,4 +1,5 @@
 # built-in
+from copy import copy
 from typing import Optional, Union
 
 # external
@@ -8,7 +9,7 @@ from packaging.markers import Variable
 
 # app
 from ._marker import BaseMarker, StringMarker, VersionMarker
-from ._operation import OrMarker, AndMarker
+from ._operation import OrMarker, AndMarker, Operation
 from ._constants import STRING_VARIABLES, VERSION_VARIABLES
 
 
@@ -55,18 +56,13 @@ class Markers:
             op=packaging.Op(operator),
             rhs=packaging.Value(value),
         )
-
-        if isinstance(self._marker, AndMarker):
-            self._marker.nodes.append(marker)
-            return marker
-
-        self._marker = AndMarker(marker, self._marker)
+        self &= marker
         return marker
 
     # private methods
 
     @staticmethod
-    def _parse(markers: Union[list, str, 'Markers', packaging.Marker]):
+    def _parse(markers: Union[list, str, 'Markers', packaging.Marker]) -> list:
         if isinstance(markers, list):
             return markers
 
@@ -90,7 +86,7 @@ class Markers:
         raise ValueError('invalid marker')
 
     @classmethod
-    def _convert(cls, markers: list):
+    def _convert(cls, markers: list) -> Operation:
         groups = [[]]  # list of nodes and operations between them
         for marker in markers:
             # single marker
@@ -147,6 +143,49 @@ class Markers:
         return new_group
 
     # magic methods
+
+    def __and__(self, other):
+        """self & other
+        """
+        new = copy(self)
+        new &= other
+        return new
+
+    def __iand__(self, other: Union['Markers', BaseMarker, Operation]):
+        """self &= other
+        """
+        if isinstance(other, Markers):
+            other = other._marker
+
+        # do not add new node if it's already added
+        if isinstance(self._marker, Operation):
+            if other in self._marker.nodes:
+                return self
+        if isinstance(self._marker, BaseMarker) and isinstance(other, BaseMarker):
+            if other == self._marker:
+                return self
+
+        if isinstance(other, (Operation, BaseMarker)):
+            self._marker = AndMarker(self._marker, other)
+            return self
+        return NotImplemented
+
+    def __or__(self, other):
+        """self | other
+        """
+        new = copy(self)
+        new |= other
+        return new
+
+    def __ior__(self, other: Union['Markers', BaseMarker, Operation]):
+        """self |= other
+        """
+        if isinstance(other, Markers):
+            other = other._marker
+        if isinstance(other, (Operation, BaseMarker)):
+            self._marker = OrMarker(self._marker, other)
+            return self
+        return NotImplemented
 
     def __repr__(self):
         return '{}({!r})'.format(type(self).__name__, self._marker)

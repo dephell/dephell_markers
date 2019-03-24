@@ -96,6 +96,29 @@ def test_str(given, expected):
         'os_name == "nt" and sys_platform != "linux" or os_name == "nt" and sys_platform == "linux"',
     ),
 ])
-def test_merge_the_same(given, expected):
+def test_simplify_the_same(given, expected):
     m = Markers(given)
     assert str(m) == expected
+
+
+@pytest.mark.parametrize('left, right, expected', [
+    ('os_name == "nt"', 'sys_platform != "linux"', 'os_name == "nt" and sys_platform != "linux"'),
+    ('os_name == "nt"', 'os_name == "nt"', 'os_name == "nt"'),
+])
+def test_and(left, right, expected):
+    assert str(Markers(left) & Markers(right)) == str(Markers(expected))
+    # inplace
+    m = Markers(left)
+    m &= Markers(right)
+    assert str(m) == str(Markers(expected))
+
+
+@pytest.mark.parametrize('left, right, expected', [
+    ('os_name == "nt"', 'sys_platform != "linux"', 'os_name == "nt" or sys_platform != "linux"'),
+])
+def test_or(left, right, expected):
+    assert str(Markers(left) | Markers(right)) == str(Markers(expected))
+    # inplace
+    m = Markers(left)
+    m |= Markers(right)
+    assert str(m) == str(Markers(expected))
