@@ -142,18 +142,7 @@ class Markers:
                 new_group.append(node)
         return new_group
 
-    # magic methods
-
-    def __and__(self, other):
-        """self & other
-        """
-        new = copy(self)
-        new &= other
-        return new
-
-    def __iand__(self, other: Union['Markers', BaseMarker, Operation]):
-        """self &= other
-        """
+    def _merge(self, other, container):
         if isinstance(other, Markers):
             other = other._marker
 
@@ -166,9 +155,23 @@ class Markers:
                 return self
 
         if isinstance(other, (Operation, BaseMarker)):
-            self._marker = AndMarker(self._marker, other)
+            self._marker = container(self._marker, other)
             return self
         return NotImplemented
+
+    # magic methods
+
+    def __and__(self, other):
+        """self & other
+        """
+        new = copy(self)
+        new &= other
+        return new
+
+    def __iand__(self, other: Union['Markers', BaseMarker, Operation]):
+        """self &= other
+        """
+        return self._merge(other=other, container=AndMarker)
 
     def __or__(self, other):
         """self | other
@@ -180,12 +183,7 @@ class Markers:
     def __ior__(self, other: Union['Markers', BaseMarker, Operation]):
         """self |= other
         """
-        if isinstance(other, Markers):
-            other = other._marker
-        if isinstance(other, (Operation, BaseMarker)):
-            self._marker = OrMarker(self._marker, other)
-            return self
-        return NotImplemented
+        return self._merge(other=other, container=OrMarker)
 
     def __repr__(self):
         return '{}({!r})'.format(type(self).__name__, self._marker)

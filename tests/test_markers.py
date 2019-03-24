@@ -115,6 +115,7 @@ def test_and(left, right, expected):
 
 @pytest.mark.parametrize('left, right, expected', [
     ('os_name == "nt"', 'sys_platform != "linux"', 'os_name == "nt" or sys_platform != "linux"'),
+    ('os_name == "nt"', 'os_name == "nt"', 'os_name == "nt"'),
 ])
 def test_or(left, right, expected):
     assert str(Markers(left) | Markers(right)) == str(Markers(expected))
