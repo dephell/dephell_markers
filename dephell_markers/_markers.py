@@ -38,6 +38,10 @@ class Markers:
             if variable in VERSION_VARIABLES:
                 if self.get_version(variable) is None:
                     return False
+
+        if 'python_version' in self.variables:
+            if not self.python_version.python_compat:
+                return False
         return True
 
     @property

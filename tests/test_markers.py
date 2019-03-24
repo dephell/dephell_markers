@@ -146,6 +146,11 @@ def test_variables(marker, expected):
     # ('os_name == "nt" and sys_platform != "linux"', True),
     ('os_name == "nt" and os_name != "nt"', False),
     ('os_name == "nt" and os_name != "unix"', True),
+
+    ('python_version >= "2.7" and python_version >= "3.4"', True),
+    ('python_version >= "2.7" and python_version <= "3.4"', True),
+    ('python_version <= "2.7" and python_version >= "3.4"', False),
+    ('python_version <= "2.7" or python_version >= "3.4"', True),
 ])
 def test_compat(marker, ok):
     assert Markers(marker).compat is ok
