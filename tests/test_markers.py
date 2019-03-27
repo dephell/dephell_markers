@@ -166,3 +166,15 @@ def test_compat(marker, ok):
 ])
 def test_get_strings(marker, values):
     assert Markers(marker).get_strings('extra') == values
+
+
+@pytest.mark.parametrize('before, after', [
+    ('os_name == "nt"', 'os_name == "nt"'),
+    ('os_name == "nt" and extra == "lol"', 'os_name == "nt"'),
+    ('os_name == "nt" or extra == "lol"', 'os_name == "nt"'),
+    ('extra == "lol"', ''),
+])
+def test_remove(before, after):
+    marker = Markers(before)
+    marker.remove('extra')
+    assert str(marker) == after

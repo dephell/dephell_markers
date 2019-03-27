@@ -73,7 +73,7 @@ class Operation:
         for node in self.nodes:
             if isinstance(node, Operation):
                 node.remove(name)
-                if node:  # if node is not empty
+                if node.nodes:
                     new_nodes.append(node)
             else:
                 if node.variable != name:
@@ -81,9 +81,6 @@ class Operation:
         self.nodes = new_nodes
 
     # magic methods
-
-    def __bool__(self) -> bool:
-        return bool(self.nodes)
 
     def __eq__(self, other):
         if not isinstance(other, Operation):

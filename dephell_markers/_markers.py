@@ -67,7 +67,11 @@ class Markers:
         return self._marker.get_strings(name=name)
 
     def remove(self, name: str) -> None:
-        self._marker.remove(name=name)
+        if isinstance(self._marker, Operation):
+            self._marker.remove(name=name)
+            return
+        if self._marker.variable == name:
+            self._marker = AndMarker()
 
     def extract(self, name: str) -> Set[str]:
         strings = self.get_strings(name=name)
