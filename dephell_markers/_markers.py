@@ -70,8 +70,8 @@ class Markers:
         self._marker.remove(name=name)
 
     def extract(self, name: str) -> Set[str]:
-        strings = self._marker.get_strings(name=name)
-        self._marker.remove(name=name)
+        strings = self.get_strings(name=name)
+        self.remove(name=name)
         return strings
 
     def add(self, *, name: str, value, operator: str = '==') -> BaseMarker:
@@ -118,7 +118,7 @@ class Markers:
         raise ValueError('invalid marker')
 
     @classmethod
-    def _convert(cls, markers: list) -> Operation:
+    def _convert(cls, markers: list) -> Union[Operation, BaseMarker]:
         groups = [[]]  # list of nodes and operations between them
         for marker in markers:
             # single marker

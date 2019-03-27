@@ -60,8 +60,13 @@ class Operation:
         return self.sep.join(sorted(op + val for op, val in values))
 
     def get_strings(self, name: str) -> Set[str]:
-        values = self._get_values(name=name)
-        return {val for op, val in values if op == '=='}
+        values = set()
+        for node in self.nodes:
+            if isinstance(node, Operation):
+                values.update(node.get_strings(name=name))
+            elif node.variable == name and node.operator == '==':
+                values.add(node.value)
+        return values
 
     def remove(self, name: str) -> None:
         new_nodes = []
