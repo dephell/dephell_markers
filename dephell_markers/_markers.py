@@ -63,6 +63,17 @@ class Markers:
     def get_version(self, name: str) -> Optional[str]:
         return self._marker.get_version(name=name)
 
+    def get_strings(self, name: str) -> Set[str]:
+        return self._marker.get_strings(name=name)
+
+    def remove(self, name: str) -> None:
+        self._marker.remove(name=name)
+
+    def extract(self, name: str) -> Set[str]:
+        strings = self._marker.get_strings(name=name)
+        self._marker.remove(name=name)
+        return strings
+
     def add(self, *, name: str, value, operator: str = '==') -> BaseMarker:
         if operator in {'in', 'not in'}:
             msg = 'unsupported operation: {}'

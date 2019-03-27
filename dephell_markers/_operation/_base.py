@@ -59,7 +59,26 @@ class Operation:
             return None
         return self.sep.join(sorted(op + val for op, val in values))
 
+    def get_strings(self, name: str) -> Set[str]:
+        values = self._get_values(name=name)
+        return {val for op, val in values if op == '=='}
+
+    def remove(self, name: str) -> None:
+        new_nodes = []
+        for node in self.nodes:
+            if isinstance(node, Operation):
+                node.remove(name)
+                if node:  # if node is not empty
+                    new_nodes.append(node)
+            else:
+                if node.variable != name:
+                    new_nodes.append(node)
+        self.nodes = new_nodes
+
     # magic methods
+
+    def __bool__(self) -> bool:
+        return bool(self.nodes)
 
     def __eq__(self, other):
         if not isinstance(other, Operation):
