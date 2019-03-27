@@ -63,6 +63,21 @@ class Markers:
     def get_version(self, name: str) -> Optional[str]:
         return self._marker.get_version(name=name)
 
+    def get_strings(self, name: str) -> Set[str]:
+        return self._marker.get_strings(name=name)
+
+    def remove(self, name: str) -> None:
+        if isinstance(self._marker, Operation):
+            self._marker.remove(name=name)
+            return
+        if self._marker.variable == name:
+            self._marker = AndMarker()
+
+    def extract(self, name: str) -> Set[str]:
+        strings = self.get_strings(name=name)
+        self.remove(name=name)
+        return strings
+
     def add(self, *, name: str, value, operator: str = '==') -> BaseMarker:
         if operator in {'in', 'not in'}:
             msg = 'unsupported operation: {}'
@@ -107,7 +122,7 @@ class Markers:
         raise ValueError('invalid marker')
 
     @classmethod
-    def _convert(cls, markers: list) -> Operation:
+    def _convert(cls, markers: list) -> Union[Operation, BaseMarker]:
         groups = [[]]  # list of nodes and operations between them
         for marker in markers:
             # single marker

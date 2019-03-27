@@ -154,3 +154,27 @@ def test_variables(marker, expected):
 ])
 def test_compat(marker, ok):
     assert Markers(marker).compat is ok
+
+
+@pytest.mark.parametrize('marker, values', [
+    ('extra == "lol"', {'lol'}),
+    ('os_name == "nt"', set()),
+    ('extra == "lol" and extra != "lal"', {'lol'}),
+    ('extra == "lol" and extra == "lal"', {'lol', 'lal'}),
+    ('extra == "lol" or extra == "lal"', {'lol', 'lal'}),
+    ('extra == "lol" and extra == "lal" or extra == "nani"', {'lol', 'lal', 'nani'}),
+])
+def test_get_strings(marker, values):
+    assert Markers(marker).get_strings('extra') == values
+
+
+@pytest.mark.parametrize('before, after', [
+    ('os_name == "nt"', 'os_name == "nt"'),
+    ('os_name == "nt" and extra == "lol"', 'os_name == "nt"'),
+    ('os_name == "nt" or extra == "lol"', 'os_name == "nt"'),
+    ('extra == "lol"', ''),
+])
+def test_remove(before, after):
+    marker = Markers(before)
+    marker.remove('extra')
+    assert str(marker) == after

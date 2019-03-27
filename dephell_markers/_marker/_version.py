@@ -1,5 +1,5 @@
 # built-in
-from typing import Optional
+from typing import Optional, Set
 
 # external
 from dephell_specifier import Specifier
@@ -22,6 +22,9 @@ class VersionMarker(BaseMarker):
 
     def get_string(self, name: str) -> Optional[str]:
         return None
+
+    def get_strings(self, name: str) -> Set[str]:
+        return set()
 
     def get_version(self, name: str) -> Optional[str]:
         if name != self.variable:

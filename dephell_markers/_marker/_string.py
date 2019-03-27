@@ -1,5 +1,5 @@
 # built-in
-from typing import Optional
+from typing import Optional, Set
 
 # external
 from packaging.markers import Op, Value
@@ -19,6 +19,12 @@ class StringMarker(BaseMarker):
 
     def get_version(self, name: str) -> Optional[str]:
         return None
+
+    def get_strings(self, name: str) -> Set[str]:
+        string = self.get_string(name)
+        if string is None:
+            return set()
+        return {string}
 
     def __str__(self):
         if isinstance(self.lhs, Value):
