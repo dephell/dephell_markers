@@ -74,7 +74,7 @@ class Markers:
 
     def get_strings(self, name: str) -> Set[str]:
         if self._marker is None:
-            return None
+            return set()
         return self._marker.get_strings(name=name)
 
     def remove(self, name: str) -> None:
