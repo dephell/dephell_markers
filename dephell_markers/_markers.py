@@ -244,7 +244,12 @@ class Markers:
         return '{}({!r})'.format(type(self).__name__, self._marker or '')
 
     def __str__(self) -> str:
-        return str(self._marker or '').strip('()')
+        if not self._marker:
+            return ''
+        result = str(self._marker)
+        if result[0] == '(' and result[-1] == ')':
+            return result[1:-1]
+        return result
 
     def __bool__(self) -> bool:
         return self._marker is not None

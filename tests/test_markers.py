@@ -75,6 +75,10 @@ def test_add_python_version():
         '(python_version>="2.4" and python_version <= "2.7") or os_name == "linux"',
         'python_version >= "2.4" and python_version <= "2.7" or os_name == "linux"',
     ),
+    (
+        '(python_version < "3" or python_version >= "3.3") and extra == "docs"',
+        '(python_version < "3" or python_version >= "3.3") and extra == "docs"',
+    ),
 ])
 def test_str(given, expected):
     m = Markers(given)
