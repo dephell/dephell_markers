@@ -14,7 +14,10 @@ from ._constants import STRING_VARIABLES, VERSION_VARIABLES
 
 
 class Markers:
-    def __init__(self, markers: Union[list, str, 'Markers', packaging.Marker]):
+    def __init__(self, markers: Union[list, str, 'Markers', packaging.Marker, None] = None):
+        if not markers:
+            self._marker = None
+            return
         markers = self._parse(markers)
         if isinstance(markers, list):
             self._marker = self._convert(markers)
@@ -25,6 +28,8 @@ class Markers:
 
     @property
     def variables(self) -> Set[str]:
+        if self._marker is None:
+            return set()
         if isinstance(self._marker, BaseMarker):
             return {self._marker.variable}
         return self._marker.variables
@@ -58,20 +63,28 @@ class Markers:
     # public methods
 
     def get_string(self, name: str) -> Optional[str]:
+        if self._marker is None:
+            return None
         return self._marker.get_string(name=name)
 
     def get_version(self, name: str) -> Optional[str]:
+        if self._marker is None:
+            return None
         return self._marker.get_version(name=name)
 
     def get_strings(self, name: str) -> Set[str]:
+        if self._marker is None:
+            return None
         return self._marker.get_strings(name=name)
 
     def remove(self, name: str) -> None:
+        if self._marker is None:
+            return
         if isinstance(self._marker, Operation):
             self._marker.remove(name=name)
             return
         if self._marker.variable == name:
-            self._marker = AndMarker()
+            self._marker = None
 
     def extract(self, name: str) -> Set[str]:
         strings = self.get_strings(name=name)
@@ -178,9 +191,15 @@ class Markers:
                 new_group.append(node)
         return new_group
 
-    def _merge(self, other, container):
+    def _merge(self, other, container) -> 'Markers':
         if isinstance(other, Markers):
             other = other._marker
+
+        if self._marker is None:
+            self._marker = other
+            return self
+        if other is None:
+            return self
 
         # do not add new node if it's already added
         if isinstance(self._marker, Operation):
@@ -197,32 +216,35 @@ class Markers:
 
     # magic methods
 
-    def __and__(self, other):
+    def __and__(self, other) -> 'Markers':
         """self & other
         """
         new = copy(self)
         new &= other
         return new
 
-    def __iand__(self, other: Union['Markers', BaseMarker, Operation]):
+    def __iand__(self, other: Union['Markers', BaseMarker, Operation]) -> 'Markers':
         """self &= other
         """
         return self._merge(other=other, container=AndMarker)
 
-    def __or__(self, other):
+    def __or__(self, other) -> 'Markers':
         """self | other
         """
         new = copy(self)
         new |= other
         return new
 
-    def __ior__(self, other: Union['Markers', BaseMarker, Operation]):
+    def __ior__(self, other: Union['Markers', BaseMarker, Operation]) -> 'Markers':
         """self |= other
         """
         return self._merge(other=other, container=OrMarker)
 
-    def __repr__(self):
-        return '{}({!r})'.format(type(self).__name__, self._marker)
+    def __repr__(self) -> str:
+        return '{}({!r})'.format(type(self).__name__, self._marker or '')
 
-    def __str__(self):
-        return str(self._marker).strip('()')
+    def __str__(self) -> str:
+        return str(self._marker or '').strip('()')
+
+    def __bool__(self) -> bool:
+        return self._marker is not None

@@ -178,3 +178,13 @@ def test_remove(before, after):
     marker = Markers(before)
     marker.remove('extra')
     assert str(marker) == after
+
+
+def test_empty():
+    m = Markers()
+    assert str(m) == ''
+    assert bool(m) is False
+
+    m &= Markers('os_name == "nt"')
+    assert str(m) == 'os_name == "nt"'
+    assert bool(m) is True
