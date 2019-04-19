@@ -86,11 +86,11 @@ def test_str(given, expected):
 
 
 @pytest.mark.parametrize('given, expected', [
-    ('os_name == "posix" and os_name == "posix"', 'os_name == "posix"',),
-    ('os_name == "posix" or os_name == "posix"', 'os_name == "posix"',),
+    ('os_name == "posix" and os_name == "posix"', 'os_name == "posix"'),
+    ('os_name == "posix" or os_name == "posix"', 'os_name == "posix"'),
 
-    ('os_name == "posix" and os_name == "win"', 'os_name == "posix" and os_name == "win"',),
-    ('os_name == "posix" or os_name == "win"', 'os_name == "posix" or os_name == "win"',),
+    ('os_name == "posix" and os_name == "win"', 'os_name == "posix" and os_name == "win"'),
+    ('os_name == "posix" or os_name == "win"', 'os_name == "posix" or os_name == "win"'),
 
     (
         '(os_name == "nt" and sys_platform != "linux") or (os_name == "nt" and sys_platform != "linux")',

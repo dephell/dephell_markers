@@ -121,7 +121,7 @@ class Markers:
             try:
                 return packaging._coerce_parse_result(packaging.MARKER.parseString(markers))
             except packaging.ParseException as e:
-                err_str = "invalid marker: {0!r}, parse error at {1!r}".format(
+                err_str = 'invalid marker: {0!r}, parse error at {1!r}'.format(
                     markers,
                     markers[e.loc:e.loc + 8],
                 )
