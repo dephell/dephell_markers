@@ -2,6 +2,20 @@
 from = {format = "poetry", path = "pyproject.toml"}
 to = {format = "setuppy", path = "setup.py"}
 
+[tool.dephell.flake8]
+from = {format = "pip", path = "requirements-flake.txt"}
+python = ">=3.6"
+command = "flake8"
+
+[tool.dephell.pytest]
+from = {format = "poetry", path = "pyproject.toml"}
+command = "pytest tests/"
+
+[tool.dephell.typing]
+from = {format = "poetry", path = "pyproject.toml"}
+command = "mypy --ignore-missing-imports --allow-redefinition dephell_venvs"
+
+
 [tool.poetry]
 name = "dephell_markers"
 version = "0.2.3"
