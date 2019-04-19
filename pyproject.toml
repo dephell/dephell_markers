@@ -18,13 +18,40 @@ command = "mypy --ignore-missing-imports --allow-redefinition dephell_markers"
 
 [tool.poetry]
 name = "dephell_markers"
-version = "0.2.3"
-authors = ["orsinium"]
+version = "0.2.4"
+authors = ["Gram <master_fess@mail.ru>"]
 description = "Work with environment markers (PEP-496)"
 readme = "README.md"
+license = "MIT"
+repository = "https://github.com/dephell/dephell_markers"
+keywords = ["dephell", "markers", "packaging", "versioning"]
+# https://pypi.org/classifiers/
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Installation/Setup",
+
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: Unix",
+]
 
 [tool.poetry.dependencies]
 python = ">=3.5"
 attrs = "*"
-dephell_specifier = "*"
 packaging = "*"
+dephell-specifier = "*"
+
+[tool.poetry.dev-dependencies]
