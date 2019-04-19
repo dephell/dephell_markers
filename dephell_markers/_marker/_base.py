@@ -1,6 +1,7 @@
 # external
 import attr
 from packaging.markers import Value, Variable
+from typing import Optional, Set
 
 # app
 from .._cached_property import cached_property
@@ -39,6 +40,19 @@ class BaseMarker:
         if isinstance(self.rhs, Value):
             return self.rhs.value
         return self.lhs.value
+
+    # interfaces
+
+    def get_string(self, name: str) -> Optional[str]:
+        raise NotImplementedError
+
+    def get_version(self, name: str) -> Optional[str]:
+        raise NotImplementedError
+
+    def get_strings(self, name: str) -> Set[str]:
+        raise NotImplementedError
+
+    # magic methods
 
     def __hash__(self) -> int:
         return hash((self.lhs.value, self.op.value, self.rhs.value))

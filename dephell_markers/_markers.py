@@ -1,6 +1,6 @@
 # built-in
 from copy import copy
-from typing import Optional, Union, Set
+from typing import Optional, Union, Set, Type
 
 # external
 from dephell_specifier import RangeSpecifier
@@ -45,7 +45,8 @@ class Markers:
                     return False
 
         if 'python_version' in self.variables:
-            if not self.python_version.python_compat:
+            python = self.python_version
+            if python is not None and not python.python_compat:
                 return False
         return True
 
@@ -97,7 +98,7 @@ class Markers:
             raise ValueError(msg.format(operator))
 
         if name in STRING_VARIABLES:
-            marker_cls = StringMarker
+            marker_cls = StringMarker   # type: Type[BaseMarker]
         elif name in VERSION_VARIABLES:
             marker_cls = VersionMarker
         marker = marker_cls(
@@ -111,7 +112,7 @@ class Markers:
     # private methods
 
     @staticmethod
-    def _parse(markers: Union[list, str, 'Markers', packaging.Marker]) -> list:
+    def _parse(markers: Union[list, str, 'Markers', packaging.Marker]):
         if isinstance(markers, list):
             return markers
 
@@ -127,23 +128,23 @@ class Markers:
                 raise packaging.InvalidMarker(err_str)
 
         if hasattr(markers, '_markers'):
-            return markers._markers
+            return markers._markers  # type: ignore
 
         if hasattr(markers, '_marker'):
-            return markers._marker
+            return markers._marker  # type: ignore
 
         raise ValueError('invalid marker')
 
     @classmethod
     def _convert(cls, markers: list) -> Union[Operation, BaseMarker]:
-        groups = [[]]  # list of nodes and operations between them
+        groups = [[]]  # type: ignore # list of nodes and operations between them
         for marker in markers:
             # single marker
             if isinstance(marker, tuple):
                 lhs, op, rhs = marker
                 var = lhs.value if isinstance(lhs, Variable) else rhs.value
                 if var in STRING_VARIABLES:
-                    marker_cls = StringMarker
+                    marker_cls = StringMarker  # type: Type[BaseMarker]
                 elif var in VERSION_VARIABLES:
                     if op.value in {'in', 'not in'}:
                         msg = 'unsupported operation for version marker {}: {}'
@@ -180,7 +181,7 @@ class Markers:
 
     @staticmethod
     def _deduplicate(group: list) -> list:
-        new_group = []
+        new_group = []  # type: list
         for node in group:
             for merged_node in new_group:
                 if type(node) is not type(merged_node):
@@ -216,7 +217,7 @@ class Markers:
 
     # magic methods
 
-    def __and__(self, other) -> 'Markers':
+    def __and__(self, other: Union['Markers', BaseMarker, Operation]) -> 'Markers':
         """self & other
         """
         new = copy(self)
@@ -228,7 +229,7 @@ class Markers:
         """
         return self._merge(other=other, container=AndMarker)
 
-    def __or__(self, other) -> 'Markers':
+    def __or__(self, other: Union['Markers', BaseMarker, Operation]) -> 'Markers':
         """self | other
         """
         new = copy(self)
