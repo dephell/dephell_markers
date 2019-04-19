@@ -1,5 +1,9 @@
 # Dephell Markers
 
+[![travis](https://travis-ci.org/dephell/dephell_markers.svg?branch=master)](https://travis-ci.org/dephell/dephell_markers)
+[![appveyor](https://ci.appveyor.com/api/projects/status/github/dephell/dephell_markers?svg=true)](https://ci.appveyor.com/project/orsinium/dephell-markers)
+[![MIT License](https://img.shields.io/pypi/l/dephell-markers.svg)](https://github.com/dephell/dephell_markers/blob/master/LICENSE)
+
 Work with environment markers (PEP-496).
 
 ## Installation
