@@ -5,7 +5,7 @@ from typing import Optional, Union, Set, Type
 # external
 from dephell_specifier import RangeSpecifier
 from packaging import markers as packaging
-from packaging.markers import Variable
+from packaging.markers import Variable, Op, Value
 
 # app
 from ._marker import BaseMarker, StringMarker, VersionMarker
@@ -141,18 +141,7 @@ class Markers:
         for marker in markers:
             # single marker
             if isinstance(marker, tuple):
-                lhs, op, rhs = marker
-                var = lhs.value if isinstance(lhs, Variable) else rhs.value
-                if var in STRING_VARIABLES:
-                    marker_cls = StringMarker  # type: Type[BaseMarker]
-                elif var in VERSION_VARIABLES:
-                    if op.value in {'in', 'not in'}:
-                        msg = 'unsupported operation for version marker {}: {}'
-                        raise ValueError(msg.format(var, op.value))
-                    marker_cls = VersionMarker
-                else:
-                    raise LookupError('unknown marker: {}'.format(var))
-                groups[-1].append(marker_cls(lhs=lhs, op=op, rhs=rhs))
+                groups[-1].append(cls._convert_single_marker(*marker))
                 continue
 
             # sub-collection
@@ -178,6 +167,27 @@ class Markers:
         if len(new_groups) == 1:
             return new_groups[0]
         return OrMarker(*cls._deduplicate(new_groups))
+
+    @staticmethod
+    def _convert_single_marker(lhs: Union[Value, Variable], op: Op,
+                               rhs: Union[Value, Variable]) -> Union[Operation, BaseMarker]:
+        var = lhs.value if type(lhs) is Variable else rhs.value
+        if var in STRING_VARIABLES:
+            return StringMarker(lhs=lhs, op=op, rhs=rhs)
+
+        if var not in VERSION_VARIABLES:
+            raise LookupError('unknown marker: {}'.format(var))
+
+        if op.value == 'in' and type(rhs) is Value:
+            values = rhs.value.split()
+            markers = [VersionMarker(lhs=lhs, op=Op('=='), rhs=Value(value)) for value in values]
+            return OrMarker(*markers)
+
+        if op.value in {'in' 'not in'}:
+            msg = 'unsupported operation for version marker {}: {}'
+            raise ValueError(msg.format(var, op.value))
+
+        return VersionMarker(lhs=lhs, op=op, rhs=rhs)
 
     @staticmethod
     def _deduplicate(group: list) -> list:
