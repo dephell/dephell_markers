@@ -18,7 +18,7 @@ command = "mypy --ignore-missing-imports --allow-redefinition dephell_markers"
 
 [tool.poetry]
 name = "dephell_markers"
-version = "0.2.6"
+version = "1.0.0"
 authors = ["Gram <master_fess@mail.ru>"]
 description = "Work with environment markers (PEP-496)"
 readme = "README.md"
@@ -53,4 +53,3 @@ python = ">=3.5"
 attrs = "*"
 packaging = "*"
 dephell-specifier = "*"
-
