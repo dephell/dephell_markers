@@ -202,3 +202,14 @@ def test_empty():
     m &= Markers('os_name == "nt"')
     assert str(m) == 'os_name == "nt"'
     assert bool(m) is True
+
+
+# https://github.com/dephell/dephell/issues/256
+def test_dedup():
+    text = """
+        python_version >= "3.4"
+        and (sys_platform == "linux2" or sys_platform == "linux")
+        or python_version >= "3.5" and python_version < "4.0"
+    """
+    m = Markers(text)
+    assert str(m).split() == text.split()
