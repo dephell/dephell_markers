@@ -8,8 +8,8 @@ from packaging.version import parse
 
 # app
 from .._cached_property import cached_property
-from ._base import BaseMarker
 from .._constants import REVERSED_OPERATIONS
+from ._base import BaseMarker
 
 
 class VersionMarker(BaseMarker):
