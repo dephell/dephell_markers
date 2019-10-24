@@ -1,16 +1,16 @@
 # built-in
 from copy import copy
-from typing import Optional, Union, Set, Type
+from typing import Optional, Set, Type, Union
 
 # external
 from dephell_specifier import RangeSpecifier
 from packaging import markers as packaging
-from packaging.markers import Variable, Op, Value
+from packaging.markers import Op, Value, Variable
 
 # app
-from ._marker import BaseMarker, StringMarker, VersionMarker
-from ._operation import OrMarker, AndMarker, Operation
 from ._constants import STRING_VARIABLES, VERSION_VARIABLES
+from ._marker import BaseMarker, StringMarker, VersionMarker
+from ._operation import AndMarker, Operation, OrMarker
 
 
 class Markers:

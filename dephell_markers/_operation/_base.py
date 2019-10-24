@@ -1,6 +1,7 @@
 # built-in
 from typing import Optional, Set
 
+# app
 from .._cached_property import cached_property
 
 
@@ -88,7 +89,7 @@ class Operation:
         return self.op == other.op and set(self.nodes) == set(other.nodes)
 
     def __hash__(self):
-        return hash(self.nodes)
+        return hash(tuple(self.nodes))
 
     def __str__(self):
         sep = ' ' + self.op + ' '
