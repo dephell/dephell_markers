@@ -10,7 +10,7 @@ from .._cached_property import cached_property
 from .._constants import ALIASES
 
 
-@attr.s(cmp=False)
+@attr.s(eq=False, order=False)
 class BaseMarker:
     lhs = attr.ib()
     op = attr.ib()
